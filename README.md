@@ -1,1 +1,1 @@
-# Multimodal_RAG_Production
+# Multimodal RAG Production
