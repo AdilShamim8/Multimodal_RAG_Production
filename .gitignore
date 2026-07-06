@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+coverage.xml
+.mypy_cache/
+.ruff_cache/
+
+# Data + models (large; never commit)
+data/
+!data/README.md
+!data/sample_recipes.json
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.faiss
+notebooks/original_notebook.ipynb
+!notebooks/original_notebook.ipynb
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Docker
+*.pid
+
+# OS
+Thumbs.db
