@@ -101,7 +101,7 @@ docker compose up -d
 ```
 
 See `docs/architecture.md` for the full system diagram and `docs/api.md` for
-the REST contract.
+The REST contract.
 
 ## Project layout
 
