@@ -1,7 +1,5 @@
 # Multimodal RAG Production
 
-> A production-grade **Multimodal Retrieval-Augmented Generation** pipeline rebuilt from [AdilShamim8/Multimodal_RAG_Production](https://github.com/AdilShamim8/Multimodal_RAG_Production).
-
 The original repository is a single 71-cell Jupyter notebook that demonstrates a
 multimodal RAG pipeline for recipe retrieval: text or image queries are embedded
 with NVIDIA Nemotron Embed VL, retrieved via cosine similarity over 10 096
