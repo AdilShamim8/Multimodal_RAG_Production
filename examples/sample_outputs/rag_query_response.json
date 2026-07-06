@@ -1,0 +1,52 @@
+{
+  "query": "tomato basil pasta",
+  "retrieved": [
+    {
+      "recipe": {
+        "id": "recipe-0000",
+        "title": "Tomato Basil Pasta",
+        "text": "# Tomato Basil Pasta\n\n**Cuisine:** Italian\n**Category:** Pasta\n\n## Ingredients\n- tomato\n- basil\n- oregano\n- ...\n\n## Instructions\n1. Prepare the tomato...",
+        "image_url": "https://picsum.photos/seed/tomato-basil-pasta/512/512",
+        "metadata": {"cuisine": "italian", "category": "pasta"}
+      },
+      "score": 0.8123,
+      "rank": 1
+    },
+    {
+      "recipe": {
+        "id": "recipe-0004",
+        "title": "Margherita Pizza",
+        "text": "# Margherita Pizza\n\n...",
+        "image_url": "https://picsum.photos/seed/margherita-pizza/512/512",
+        "metadata": {"cuisine": "italian", "category": "pizza"}
+      },
+      "score": 0.7421,
+      "rank": 2
+    }
+  ],
+  "reranked": [
+    {
+      "recipe": { "id": "recipe-0000", "title": "Tomato Basil Pasta", "text": "..." },
+      "score": 0.9210,
+      "rank": 1
+    },
+    {
+      "recipe": { "id": "recipe-0004", "title": "Margherita Pizza", "text": "..." },
+      "score": 0.8532,
+      "rank": 2
+    }
+  ],
+  "summary": "Top pick: Tomato Basil Pasta — a classic Italian pasta combining fresh tomatoes, basil, and parmesan. Cooks in under 30 minutes and serves 4-6. Margherita Pizza is a great alternative if you want a similar flavor profile in pizza form.",
+  "timings": {
+    "retrieve": 0.012,
+    "rerank": 0.034,
+    "generate": 0.156,
+    "total": 0.202
+  },
+  "providers": {
+    "embedding": "mock",
+    "reranker": "mock",
+    "generator": "mock",
+    "vector_store": "chroma"
+  }
+}

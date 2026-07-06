@@ -1,0 +1,18 @@
+# Prometheus scrape config for the multimodal-rag stack.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: multimodal-rag-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: [api:8000]
+        labels:
+          service: api
+
+  - job_name: qdrant
+    static_configs:
+      - targets: [qdrant:6333]
+        labels:
+          service: qdrant
