@@ -1,0 +1,42 @@
+name: Nightly full eval
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # 2 AM UTC daily
+  workflow_dispatch:
+
+jobs:
+  full-eval:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: rag
+          POSTGRES_PASSWORD: rag
+          POSTGRES_DB: rag
+        ports: ["5432:5432"]
+    env:
+      DATABASE_URL: postgresql+asyncpg://rag:rag@localhost:5432/rag
+      REDIS_URL: redis://localhost:6379/0
+      JWT_SECRET: test-secret-please-change-me-to-64-chars-aaaaaaaaaaaa
+      APP_SECRET_KEY: test-secret-please-change-me-to-64-chars-aaaaaaaaaaaa
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+      - run: alembic upgrade head
+      - run: python -m scripts.seed
+      - run: make ingest-local
+      - run: make eval
+      - run: make eval-compare
+      - name: Upload eval reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-reports
+          path: evals/reports/

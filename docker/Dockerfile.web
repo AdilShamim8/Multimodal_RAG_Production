@@ -1,0 +1,27 @@
+# =============================================================================
+# Dockerfile.web — Next.js 14 frontend
+# =============================================================================
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+# Install deps (cached layer)
+COPY apps/web/package.json apps/web/package-lock.json* ./
+RUN npm ci --prefer-offline || npm install
+
+# Copy source
+COPY apps/web ./
+
+# Build
+RUN npm run build
+
+# Production image
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=base /app ./
+
+EXPOSE 3000
+
+CMD ["npm", "start"]

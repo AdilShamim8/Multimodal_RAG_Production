@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests apps scripts evals
+      - run: black --check src tests apps scripts evals
+      - run: mypy src
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/unit -v --cov=src --cov-report=xml
+      - uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: rag
+          POSTGRES_PASSWORD: rag
+          POSTGRES_DB: rag
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U rag"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql+asyncpg://rag:rag@localhost:5432/rag
+      REDIS_URL: redis://localhost:6379/0
+      JWT_SECRET: test-secret-please-change-me-to-64-chars-aaaaaaaaaaaa
+      APP_SECRET_KEY: test-secret-please-change-me-to-64-chars-aaaaaaaaaaaa
+      OPENAI_API_KEY: sk-test
+      HF_TOKEN: hf_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+      - run: alembic upgrade head
+      - run: python -m scripts.seed
+      - run: pytest tests/integration -v
+
+  security-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: rag
+          POSTGRES_PASSWORD: rag
+          POSTGRES_DB: rag
+        ports: ["5432:5432"]
+    env:
+      DATABASE_URL: postgresql+asyncpg://rag:rag@localhost:5432/rag
+      REDIS_URL: redis://localhost:6379/0
+      JWT_SECRET: test-secret-please-change-me-to-64-chars-aaaaaaaaaaaa
+      APP_SECRET_KEY: test-secret-please-change-me-to-64-chars-aaaaaaaaaaaa
+      OPENAI_API_KEY: sk-test
+      HF_TOKEN: hf_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+      - run: alembic upgrade head
+      - run: python -m scripts.seed
+      - run: pytest tests/security -v
+
+  eval-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: rag
+          POSTGRES_PASSWORD: rag
+          POSTGRES_DB: rag
+        ports: ["5432:5432"]
+    env:
+      DATABASE_URL: postgresql+asyncpg://rag:rag@localhost:5432/rag
+      REDIS_URL: redis://localhost:6379/0
+      JWT_SECRET: test-secret-please-change-me-to-64-chars-aaaaaaaaaaaa
+      APP_SECRET_KEY: test-secret-please-change-me-to-64-chars-aaaaaaaaaaaa
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      EVAL_FAITHFULNESS_MIN: "0.85"
+      EVAL_HALLUCINATION_RATE_MAX: "0.10"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+      - run: alembic upgrade head
+      - run: python -m scripts.seed
+      - run: make eval-smoke
+      - name: Quality gate
+        run: |
+          # Parse the smoke eval report and assert faithfulness >= threshold
+          python -c "
+          import json, sys, os
+          # TODO: parse the actual report
+          faithfulness = 0.0  # placeholder
+          threshold = float(os.environ.get('EVAL_FAITHFULNESS_MIN', '0.85'))
+          if faithfulness < threshold:
+              print(f'FAIL: faithfulness {faithfulness} < {threshold}')
+              sys.exit(1)
+          print(f'OK: faithfulness {faithfulness} >= {threshold}')
+          "
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, integration-tests, security-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f docker/Dockerfile.api -t agentic-rag-api:ci .
+      - run: docker build -f docker/Dockerfile.web -t agentic-rag-web:ci .

@@ -1,0 +1,43 @@
+# =============================================================================
+# Dockerfile.api — FastAPI backend + worker
+# =============================================================================
+FROM python:3.11-slim AS base
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    HF_HOME=/app/.cache/huggingface
+
+# System deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install Python deps first (cached layer)
+COPY pyproject.toml ./
+RUN pip install --upgrade pip && \
+    pip install -e ".[dev]"
+
+# Copy source
+COPY src ./src
+COPY apps/api ./apps/api
+COPY scripts ./scripts
+COPY evals ./evals
+COPY prompts ./prompts
+COPY configs ./configs
+COPY alembic ./alembic
+COPY alembic.ini ./
+COPY Makefile ./
+
+# Healthcheck
+HEALTHCHECK --interval=10s --timeout=5s --retries=10 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+EXPOSE 8000
+
+CMD ["uvicorn", "apps.api.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
