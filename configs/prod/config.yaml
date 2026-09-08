@@ -1,0 +1,26 @@
+# Production config
+
+app:
+  env: prod
+  log_level: WARNING
+
+database:
+  pool_size: 50
+  max_overflow: 100
+
+retrieval:
+  default_strategy: hybrid_reranked
+  candidate_count: 100
+  top_k: 10
+
+agent:
+  max_steps: 6           # tighter in prod
+  global_timeout_s: 20   # tighter in prod
+
+memory:
+  extraction_enabled: true
+  max_per_user: 1000
+
+evaluation:
+  faithfulness_min: 0.90   # stricter in prod
+  hallucination_rate_max: 0.05

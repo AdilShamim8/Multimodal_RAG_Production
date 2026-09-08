@@ -1,0 +1,40 @@
+# Default application config — overridden by environment-specific configs.
+
+app:
+  env: dev
+  log_level: INFO
+
+database:
+  pool_size: 10
+  max_overflow: 20
+
+retrieval:
+  default_strategy: hybrid_reranked
+  candidate_count: 50
+  top_k: 10
+  similarity_threshold: 0.2
+
+reranker:
+  top_k: 5
+
+agent:
+  max_steps: 8
+  max_retries_per_step: 2
+  global_timeout_s: 30
+  max_tool_calls: 10
+
+memory:
+  short_term_window: 10
+  extraction_enabled: true
+  max_per_user: 500
+
+ingestion:
+  chunk_size: 512
+  chunk_overlap: 64
+  chunk_strategy: structure-aware
+  batch_size: 100
+
+evaluation:
+  faithfulness_min: 0.85
+  hallucination_rate_max: 0.10
+  smoke_size: 10

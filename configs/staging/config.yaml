@@ -1,0 +1,18 @@
+# Staging config
+
+app:
+  env: staging
+  log_level: INFO
+
+database:
+  pool_size: 20
+  max_overflow: 40
+
+retrieval:
+  default_strategy: hybrid_reranked
+  candidate_count: 50
+  top_k: 10
+
+agent:
+  max_steps: 8
+  global_timeout_s: 30

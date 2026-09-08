@@ -1,0 +1,14 @@
+# Development config
+
+app:
+  env: dev
+  log_level: DEBUG
+
+database:
+  pool_size: 5
+  max_overflow: 10
+
+retrieval:
+  default_strategy: hybrid_reranked
+  candidate_count: 20   # smaller for faster dev iteration
+  top_k: 5
