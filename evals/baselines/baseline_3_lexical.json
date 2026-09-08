@@ -1,0 +1,14 @@
+{
+  "name": "baseline_3_lexical",
+  "description": "Lexical-only retrieval via Postgres FTS (ts_rank_cd)",
+  "retriever": "lexical",
+  "reranker": null,
+  "chunking": "structure-aware",
+  "top_k": 10,
+  "candidate_count": 50,
+  "embedder": "BAAI/bge-m3",
+  "reranker_model": null,
+  "llm": "gpt-4o-mini",
+  "prompt_version": "v1",
+  "agent_enabled": false
+}

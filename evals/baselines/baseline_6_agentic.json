@@ -1,0 +1,19 @@
+{
+  "name": "baseline_6_agentic",
+  "description": "Full agentic RAG — planner, query decomposition, multi-step retrieval, evidence validation, citation validation",
+  "retriever": "hybrid",
+  "reranker": "BAAI/bge-reranker-v2-m3",
+  "chunking": "structure-aware",
+  "top_k": 10,
+  "candidate_count": 50,
+  "reranker_top_k": 5,
+  "embedder": "BAAI/bge-m3",
+  "reranker_model": "BAAI/bge-reranker-v2-m3",
+  "llm": "gpt-4o-mini",
+  "strong_llm": "gpt-4o",
+  "prompt_version": "v1",
+  "agent_enabled": true,
+  "agent_max_steps": 8,
+  "agent_max_tool_calls": 10,
+  "agent_global_timeout_s": 30
+}

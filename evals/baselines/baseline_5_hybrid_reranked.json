@@ -1,0 +1,15 @@
+{
+  "name": "baseline_5_hybrid_reranked",
+  "description": "Hybrid retrieval + BGE cross-encoder reranking",
+  "retriever": "hybrid",
+  "reranker": "BAAI/bge-reranker-v2-m3",
+  "chunking": "structure-aware",
+  "top_k": 10,
+  "candidate_count": 50,
+  "reranker_top_k": 5,
+  "embedder": "BAAI/bge-m3",
+  "reranker_model": "BAAI/bge-reranker-v2-m3",
+  "llm": "gpt-4o-mini",
+  "prompt_version": "v1",
+  "agent_enabled": false
+}
