@@ -1,0 +1,245 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-rag-platform"
+version = "1.0.0"
+description = "Production-grade Agentic RAG platform with hybrid retrieval, reranking, agentic orchestration, memory, RBAC, evaluation, and observability."
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Your Name", email = "you@example.com"}
+]
+keywords = ["rag", "agentic", "retrieval", "llm", "production"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    # Web framework
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.0",
+    "python-multipart>=0.0.12",
+    # Database
+    "sqlalchemy[asyncio]>=2.0.35",
+    "asyncpg>=0.29.0",
+    "alembic>=1.13.0",
+    "pgvector>=0.3.6",
+    # Auth
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-jwt",
+    # LLM + embeddings
+    "openai>=1.51.0",
+    "anthropic>=0.39.0",
+    "sentence-transformers>=3.1.0",
+    "tiktoken>=0.7.0",
+    # Document processing
+    "docling>=2.5.0",
+    "trafilatura>=1.12.0",
+    "python-docx>=1.1.2",
+    "beautifulsoup4>=4.12.0",
+    "markdownify>=0.13.1",
+    # Reranker
+    "FlagEmbedding>=1.2.10",
+    # Observability
+    "opentelemetry-api>=1.27.0",
+    "opentelemetry-sdk>=1.27.0",
+    "opentelemetry-instrumentation-fastapi>=0.48b0",
+    "opentelemetry-instrumentation-httpx>=0.48b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.48b0",
+    "opentelemetry-exporter-otlp>=1.27.0",
+    "structlog>=24.4.0",
+    "prometheus-client>=0.21.0",
+    # Evaluation
+    "ragas>=0.2.0",
+    "datasets>=3.0.0",
+    "numpy>=1.26.0",
+    "scikit-learn>=1.5.0",
+    # Caching
+    "redis>=5.1.0",
+    # HTTP
+    "httpx>=0.27.0",
+    "tenacity>=9.0.0",
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "typer>=0.12.0",
+    "rich>=13.9.0",
+    "orjson>=3.16.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.14.0",
+    "ruff>=0.6.0",
+    "black>=24.8.0",
+    "mypy>=1.11.0",
+    "pre-commit>=3.8.0",
+    "detect-secrets>=1.5.0",
+    "types-redis",
+    "types-passlib",
+    "httpx[cli]",
+    "ipython",
+    "ipdb",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/agentic-rag-platform"
+Repository = "https://github.com/your-org/agentic-rag-platform"
+Documentation = "https://github.com/your-org/agentic-rag-platform/tree/main/docs"
+Issues = "https://github.com/your-org/agentic-rag-platform/issues"
+
+[project.scripts]
+rag = "apps.api.app.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "apps*", "evals*", "scripts*"]
+exclude = ["tests*", "data*", "docs*"]
+
+# -----------------------------------------------------------------------------
+# Ruff
+# -----------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [
+    ".venv", ".git", "__pycache__", "build", "dist", "node_modules",
+    ".mypy_cache", ".pytest_cache", ".ruff_cache",
+    "alembic/versions",  # auto-generated migrations
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "RUF", # ruff-specific
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function call in argument defaults (FastAPI Depends)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]  # assert False in tests is fine
+"alembic/*" = ["E402", "F401"]  # imports in migrations
+
+# -----------------------------------------------------------------------------
+# Black
+# -----------------------------------------------------------------------------
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.venv
+  | \.git
+  | __pycache__
+  | build
+  | dist
+  | node_modules
+  | alembic/versions
+)/
+'''
+
+# -----------------------------------------------------------------------------
+# Mypy
+# -----------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = false  # FastAPI decorators
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "docling.*",
+    "trafilatura.*",
+    "FlagEmbedding.*",
+    "ragas.*",
+    "datasets.*",
+    "pgvector.*",
+]
+ignore_missing_imports = true
+
+# -----------------------------------------------------------------------------
+# Pytest
+# -----------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--showlocals",
+    "--tb=short",
+]
+markers = [
+    "unit: marks tests as unit tests (no I/O)",
+    "integration: marks tests as integration tests (require DB / API)",
+    "security: marks tests as security tests",
+    "regression: marks tests as regression tests",
+    "slow: marks tests as slow (> 1 second)",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:docling.*",
+    "ignore::DeprecationWarning:sentence_transformers.*",
+]
+
+# -----------------------------------------------------------------------------
+# Coverage
+# -----------------------------------------------------------------------------
+[tool.coverage.run]
+source = ["src", "apps"]
+omit = [
+    "*/tests/*",
+    "*/alembic/*",
+    "*/__init__.py",
+]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+show_missing = true
+skip_covered = false
